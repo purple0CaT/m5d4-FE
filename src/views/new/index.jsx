@@ -56,8 +56,8 @@ const NewBlogPost = () => {
           "Context-Type": "application/json",
         },
       });
-      let data = await response.json();
       if (response.ok) {
+        let data = await response.json();
         // sendCover(data.postId);
         console.log(data);
       } else {
