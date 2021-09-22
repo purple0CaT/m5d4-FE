@@ -1,2 +1,1 @@
-# m5d4-FE
- 
+# Strive Blog Template
