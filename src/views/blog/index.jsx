@@ -10,14 +10,6 @@ class Blog extends Component {
   };
   componentDidMount = () => {
     this.fetchDatas();
-    // const { id } = this.props.match.params;
-    // console.log(posts);
-    // const blog = posts.find((post) => post._id.toString() === id);
-    // if (blog) {
-    //   this.setState({ blog, loading: false });
-    // } else {
-    //   this.props.history.push("/404");
-    // }
   };
   fetchDatas = async () => {
     const url =
@@ -59,6 +51,12 @@ class Blog extends Component {
             </div>
 
             <div dangerouslySetInnerHTML={{ __html: blog[0].content }}></div>
+            <a
+              className="btn btn-primary"
+              href={`${process.env.REACT_APP_URLTOFETCH}/blogPosts/${this.props.match.params.id}/savePDF`}
+            >
+              Download as PDF
+            </a>
           </Container>
         </div>
       );
