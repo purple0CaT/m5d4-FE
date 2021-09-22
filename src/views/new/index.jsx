@@ -7,19 +7,21 @@ import { useState, useEffect } from "react";
 
 const NewBlogPost = () => {
   const [Post, setPost] = useState({
-    category: "123",
-    title: "123",
-    cover: "",
-    readTime: { value: 1, unit: "minutes" },
-    author: {
-      name: "Ian",
-      _id: "123kjwabn123sj",
-      avatar: "https://source.unsplash.com/random?1",
+    body: {
+      category: "123",
+      title: "123",
+      cover: "",
+      readTime: { value: 1, unit: "minutes" },
+      author: {
+        name: "Ian",
+        _id: "123kjwabn123sj",
+        avatar: "https://source.unsplash.com/random?1",
+      },
+      content: "This is created on frontEnd and saved in backend",
     },
-    content: "This is created on frontEnd and saved in backend",
   });
   const [Authors, setAuthors] = useState({ data: [] });
-  const [Cover, setCover] = useState();
+  const [Cover, setCover] = useState({ postCover: "", avatar: "" });
 
   useEffect(() => {
     fetchAuthors();
@@ -46,22 +48,22 @@ const NewBlogPost = () => {
   const sendPost = async (e) => {
     e.preventDefault();
     const url = `${process.env.REACT_APP_URLTOFETCH}/blogPosts/`;
-    console.log(Post);
+    // console.log(Post);
     // SENDING;
     try {
       let response = await fetch(url, {
         method: "POST",
-        body: JSON.stringify(Post),
+        body: JSON.stringify(Post.body),
         headers: {
-          "Context-Type": "application/json",
+          "Content-Type": "application/json",
         },
       });
       if (response.ok) {
         let data = await response.json();
-        // sendCover(data.postId);
-        console.log(data);
+        !data[0].author && sendAuthorAvatar(data[0].authorId);
+        sendCover(data[0]._id);
       } else {
-        console.log();
+        console.log("ERROR!");
       }
     } catch (err) {
       console.log(err);
@@ -71,7 +73,7 @@ const NewBlogPost = () => {
   const sendCover = async (id) => {
     const url = `${process.env.REACT_APP_URLTOFETCH}/${id}/uploadCover/`;
     const formData = new FormData();
-    formData.append("coverPic", Cover);
+    formData.append("coverPic", Cover.postCover);
     try {
       let response = await fetch(url, {
         method: "POST",
@@ -89,6 +91,29 @@ const NewBlogPost = () => {
       console.log(err);
     }
   };
+  // Send Author avatar
+  const sendAuthorAvatar = async (id) => {
+    const url = `${process.env.REACT_APP_URLTOFETCH}/authors/${id}/uploadAvatar/`;
+    const formData = new FormData();
+    formData.append("avatar", Cover.avatar);
+    try {
+      let response = await fetch(url, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "Context-Type": "multipart/form-data",
+        },
+      });
+      if (response.ok) {
+        console.log("Sended!");
+      } else {
+        console.log(formData);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   return (
     <Container className="new-blog-container">
       <Form className="mt-5" onSubmit={sendPost}>
@@ -115,7 +140,9 @@ const NewBlogPost = () => {
             className="my-4"
             label=""
             // value={this.state.coverFile}
-            onChange={(e) => setCover(e.target.files[0])}
+            onChange={(e) =>
+              setCover({ ...Cover, postCover: e.target.files[0] })
+            }
           />
         </Form.Group>
         <hr />
@@ -124,8 +151,10 @@ const NewBlogPost = () => {
           <Form.Control
             size="lg"
             placeholder="Title"
-            value={Post.title}
-            onChange={(e) => setPost({ ...Post, title: e.target.value })}
+            value={Post.body.title}
+            onChange={(e) =>
+              setPost({ body: { ...Post.body, title: e.target.value } })
+            }
           />
         </Form.Group>
         <Form.Group controlId="blog-category" className="mt-3">
@@ -133,7 +162,9 @@ const NewBlogPost = () => {
           <Form.Control
             size="lg"
             as="select"
-            onChange={(e) => setPost({ ...Post, category: e.target.value })}
+            onChange={(e) =>
+              setPost({ body: { ...Post.body, category: e.target.value } })
+            }
           >
             <option>Some category</option>
             <option>Else one</option>
@@ -149,8 +180,10 @@ const NewBlogPost = () => {
             rows={5}
             // onChange={this.handleChange}
             // className="new-blog-content"
-            value={Post.content}
-            onChange={(e) => setPost({ ...Post, content: e.target.value })}
+            value={Post.body.content}
+            onChange={(e) =>
+              setPost({ body: { ...Post.body, content: e.target.value } })
+            }
           />
         </Form.Group>
         <hr />
@@ -165,10 +198,12 @@ const NewBlogPost = () => {
             onChange={(e) =>
               // console.log(e.target.value)
               setPost({
-                ...Post,
-                author: Authors.data.filter(
-                  (auth) => auth._id == e.target.value
-                )[0],
+                body: {
+                  ...Post.body,
+                  author: Authors.data.filter(
+                    (auth) => auth._id == e.target.value
+                  )[0],
+                },
               })
             }
           >
@@ -182,7 +217,7 @@ const NewBlogPost = () => {
         </Form.Group>
         <br />
         <img
-          src={Post.author.avatar}
+          src={Post.body.author.avatar}
           style={{
             width: "10rem",
             height: "10rem",
@@ -200,11 +235,17 @@ const NewBlogPost = () => {
           <Form.Control
             size="lg"
             placeholder="Author name"
-            value={Post.author.name}
+            value={Post.body.author.name}
             onChange={(e) =>
               setPost({
-                ...Post,
-                author: { ...Post.author, name: e.target.value, _id: "" },
+                body: {
+                  ...Post.body,
+                  author: {
+                    ...Post.body.author,
+                    name: e.target.value,
+                    _id: "",
+                  },
+                },
               })
             }
           />
