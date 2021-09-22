@@ -10,9 +10,7 @@ export default class BlogList extends Component {
     this.fetchDatas();
   };
   fetchDatas = async () => {
-    console.log(process.env.REACT_APP_URLFETCHING);
-
-    const url = `${process.env.REACT_APP_URLFETCHING}/blogPosts/`;
+    const url = `${process.env.REACT_APP_URLTOFETCH}/blogPosts/`;
     try {
       let response = await fetch(url);
       let data = await response.json();

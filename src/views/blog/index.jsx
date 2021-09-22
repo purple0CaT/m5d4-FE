@@ -21,7 +21,7 @@ class Blog extends Component {
   };
   fetchDatas = async () => {
     const url =
-      `${process.env.REACT_APP_URLFETCHING}/blogPosts/` +
+      `${process.env.REACT_APP_URLTOFETCH}/blogPosts/` +
       this.props.match.params.id;
     try {
       let response = await fetch(url);
