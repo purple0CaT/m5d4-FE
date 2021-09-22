@@ -7,10 +7,9 @@ import { useState, useEffect } from "react";
 
 const NewBlogPost = () => {
   const [Post, setPost] = useState({
-    category: "",
-    title: "",
+    category: "123",
+    title: "123",
     cover: "",
-    coverFile: "",
     readTime: { value: 1, unit: "minutes" },
     author: {
       name: "Ian",
@@ -18,7 +17,6 @@ const NewBlogPost = () => {
       avatar: "https://source.unsplash.com/random?1",
     },
     content: "This is created on frontEnd and saved in backend",
-    img: "",
   });
   const [Authors, setAuthors] = useState({ data: [] });
   const [Cover, setCover] = useState();
@@ -27,9 +25,28 @@ const NewBlogPost = () => {
     fetchAuthors();
   }, []);
 
-  const sendPostwithIng = async (e) => {
+  // All authors
+  const fetchAuthors = async () => {
+    const url = `${process.env.REACT_APP_URLTOFETCH}/authors/`;
+    try {
+      let response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      let data = await response.json();
+      if (response.ok) {
+        setAuthors({ data: data });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  const sendPost = async (e) => {
     e.preventDefault();
     const url = `${process.env.REACT_APP_URLTOFETCH}/blogPosts/`;
+    console.log(Post);
     // SENDING;
     try {
       let response = await fetch(url, {
@@ -41,29 +58,10 @@ const NewBlogPost = () => {
       });
       let data = await response.json();
       if (response.ok) {
-        sendCover(data.postId);
-        console.log("Sended!");
+        // sendCover(data.postId);
+        console.log(data);
       } else {
         console.log();
-      }
-    } catch (err) {
-      console.log(err);
-    }
-  };
-  // All authors
-  const fetchAuthors = async () => {
-    const url = `${process.env.REACT_APP_URLTOFETCH}/authors/`;
-    try {
-      let response = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-type": "application/json",
-        },
-      });
-      let data = await response.json();
-      if (response.ok) {
-        console.log("Successfuly fetched!", data);
-        setAuthors({ data: data });
       }
     } catch (err) {
       console.log(err);
@@ -72,10 +70,8 @@ const NewBlogPost = () => {
   // Send Cover!
   const sendCover = async (id) => {
     const url = `${process.env.REACT_APP_URLTOFETCH}/${id}/uploadCover/`;
-
     const formData = new FormData();
     formData.append("coverPic", Cover);
-
     try {
       let response = await fetch(url, {
         method: "POST",
@@ -95,7 +91,7 @@ const NewBlogPost = () => {
   };
   return (
     <Container className="new-blog-container">
-      <Form className="mt-5" onSubmit={sendPostwithIng}>
+      <Form className="mt-5" onSubmit={sendPost}>
         <Form.Group controlId="blog-cover" className="mt-3">
           <p className=" my-2 font-weight-light" style={{ fontSize: "2rem" }}>
             New post!
@@ -208,12 +204,12 @@ const NewBlogPost = () => {
             onChange={(e) =>
               setPost({
                 ...Post,
-                author: { ...Post.author, name: e.target.value },
+                author: { ...Post.author, name: e.target.value, _id: "" },
               })
             }
           />
         </Form.Group>
-        <Form.Group>
+        <Form.Group className="mt-3">
           <Form.Label>Avatar</Form.Label>
           {/* <Form.Control
             size="lg"
@@ -230,9 +226,9 @@ const NewBlogPost = () => {
           {/* <Form.Group> */}
           <Form.File
             id="blog-img"
-            className="my-4"
-            label="Image"
-            onChange={(e) => setCover({ ...Cover, avatar: e.target.files[0] })}
+            onChange={(e) =>
+              setCover({ ...Cover, avatar: e.target.files[0], _id: "" })
+            }
           />
         </Form.Group>
         <Form.Group className="d-flex mt-3 justify-content-end">
