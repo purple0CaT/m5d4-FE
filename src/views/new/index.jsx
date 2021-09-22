@@ -3,101 +3,253 @@ import "react-quill/dist/quill.snow.css";
 import ReactQuill from "react-quill";
 import { Container, Form, Button } from "react-bootstrap";
 import "./styles.css";
-export default class NewBlogPost extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      category: "",
-      title: "",
-      cover: "https://source.unsplash.com/random",
-      readTime: { value: 1, unit: "minutes" },
-      author: { name: "Ian", avatar: "https://source.unsplash.com/random?1" },
-      content: "This is created on frontEnd and saved in backend",
-    };
-    this.handleChange = this.handleChange.bind(this);
-  }
+import { useState, useEffect } from "react";
 
-  handleChange(value) {
-    this.setState({ ...this.state, content: value });
-  }
+const NewBlogPost = () => {
+  const [Post, setPost] = useState({
+    category: "",
+    title: "",
+    cover: "",
+    coverFile: "",
+    readTime: { value: 1, unit: "minutes" },
+    author: {
+      name: "Ian",
+      _id: "123kjwabn123sj",
+      avatar: "https://source.unsplash.com/random?1",
+    },
+    content: "This is created on frontEnd and saved in backend",
+    img: "",
+  });
+  const [Authors, setAuthors] = useState({ data: [] });
+  const [Cover, setCover] = useState();
 
-  sendPost = async (e) => {
-    const url = `${process.env.REACT_APP_URLTOFETCH}/blogPosts/`;
+  useEffect(() => {
+    fetchAuthors();
+  }, []);
+
+  const sendPostwithIng = async (e) => {
     e.preventDefault();
+    const url = `${process.env.REACT_APP_URLTOFETCH}/blogPosts/`;
+    // SENDING;
     try {
       let response = await fetch(url, {
         method: "POST",
-        body: JSON.stringify(this.state),
+        body: JSON.stringify(Post),
         headers: {
-          "Content-type": "application/json",
+          "Context-Type": "application/json",
         },
       });
-      let data = response.json();
+      let data = await response.json();
       if (response.ok) {
-        console.log("Successfuly posted!");
-        console.log(data);
+        sendCover(data.postId);
+        console.log("Sended!");
+      } else {
+        console.log();
       }
     } catch (err) {
       console.log(err);
     }
   };
-  render() {
-    return (
-      <Container className="new-blog-container">
-        <Form className="mt-5" onSubmit={this.sendPost}>
-          <Form.Group controlId="blog-form" className="mt-3">
-            <Form.Label>Title</Form.Label>
-            <Form.Control
-              size="lg"
-              placeholder="Title"
-              value={this.state.title}
-              onChange={(e) =>
-                this.setState({ ...this.state, title: e.target.value })
-              }
-            />
-          </Form.Group>
-          <Form.Group controlId="blog-category" className="mt-3">
-            <Form.Label>Category</Form.Label>
-            <Form.Control
-              defaultValue="Learning"
-              size="lg"
-              as="select"
-              onChange={(e) =>
-                this.setState({ ...this.state, category: e.target.value })
-              }
-            >
-              <option>Learning</option>
-              <option>Product</option>
-              <option>Developers</option>
-              <option>Quick tips</option>
-            </Form.Control>
-          </Form.Group>
-          <Form.Group controlId="blog-content" className="mt-3">
-            <Form.Label>Blog Content</Form.Label>
-            <ReactQuill
-              onChange={this.handleChange}
-              className="new-blog-content"
-              value={this.state.content}
-              // onChange={(e) =>
-              //   this.setState({ ...this.state, category: e.target.value})
-              // }
-            />
-          </Form.Group>
-          <Form.Group className="d-flex mt-3 justify-content-end">
-            <Button type="reset" size="lg" variant="outline-dark">
-              Reset
-            </Button>
-            <Button
-              type="submit"
-              size="lg"
-              variant="dark"
-              style={{ marginLeft: "1em" }}
-            >
-              Submit
-            </Button>
-          </Form.Group>
-        </Form>
-      </Container>
-    );
-  }
-}
+  // All authors
+  const fetchAuthors = async () => {
+    const url = `${process.env.REACT_APP_URLTOFETCH}/authors/`;
+    try {
+      let response = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-type": "application/json",
+        },
+      });
+      let data = await response.json();
+      if (response.ok) {
+        console.log("Successfuly fetched!", data);
+        setAuthors({ data: data });
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  // Send Cover!
+  const sendCover = async (id) => {
+    const url = `${process.env.REACT_APP_URLTOFETCH}/${id}/uploadCover/`;
+
+    const formData = new FormData();
+    formData.append("coverPic", Cover);
+
+    try {
+      let response = await fetch(url, {
+        method: "POST",
+        body: formData,
+        headers: {
+          "Context-Type": "multipart/form-data",
+        },
+      });
+      if (response.ok) {
+        console.log("Sended!");
+      } else {
+        console.log(formData);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
+  return (
+    <Container className="new-blog-container">
+      <Form className="mt-5" onSubmit={sendPostwithIng}>
+        <Form.Group controlId="blog-cover" className="mt-3">
+          <p className=" my-2 font-weight-light" style={{ fontSize: "2rem" }}>
+            New post!
+          </p>
+          <Form.Label>Cover image</Form.Label>
+          {/* <Form.Control
+            size="lg"
+            placeholder="Title"
+            value={Post.cover}
+            onChange={(e) =>
+              this.setState({ ...this.state, cover: e.target.value })
+            }
+          />
+        </Form.Group>
+        <p className=" my-2 font-weight-light" style={{ fontSize: "1.5rem" }}>
+          or upload
+        </p>
+        <Form.Group> */}
+          <Form.File
+            id="blog-img"
+            className="my-4"
+            label=""
+            // value={this.state.coverFile}
+            onChange={(e) => setCover(e.target.files[0])}
+          />
+        </Form.Group>
+        <hr />
+        <Form.Group controlId="blog-form" className="mt-3">
+          <Form.Label>Title</Form.Label>
+          <Form.Control
+            size="lg"
+            placeholder="Title"
+            value={Post.title}
+            onChange={(e) => setPost({ ...Post, title: e.target.value })}
+          />
+        </Form.Group>
+        <Form.Group controlId="blog-category" className="mt-3">
+          <Form.Label>Category</Form.Label>
+          <Form.Control
+            size="lg"
+            as="select"
+            onChange={(e) => setPost({ ...Post, category: e.target.value })}
+          >
+            <option>Some category</option>
+            <option>Else one</option>
+            <option>Or this one</option>
+            <option>guse</option>
+            <option>doggo</option>
+          </Form.Control>
+        </Form.Group>
+        <Form.Group controlId="blog-content" className="mt-3">
+          <Form.Label>Blog Content</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={5}
+            // onChange={this.handleChange}
+            // className="new-blog-content"
+            value={Post.content}
+            onChange={(e) => setPost({ ...Post, content: e.target.value })}
+          />
+        </Form.Group>
+        <hr />
+        <p className=" my-2 font-weight-light" style={{ fontSize: "2.5rem" }}>
+          Author details
+        </p>
+        <Form.Group controlId="blog-authorsLib" className="mt-3">
+          <Form.Label>Existing authors</Form.Label>
+          <Form.Control
+            size="lg"
+            as="select"
+            onChange={(e) =>
+              // console.log(e.target.value)
+              setPost({
+                ...Post,
+                author: Authors.data.filter(
+                  (auth) => auth._id == e.target.value
+                )[0],
+              })
+            }
+          >
+            {Authors &&
+              Authors.data.map((authr) => (
+                <option key={authr._id + authr.name} value={authr._id}>
+                  {authr.name}
+                </option>
+              ))}
+          </Form.Control>
+        </Form.Group>
+        <br />
+        <img
+          src={Post.author.avatar}
+          style={{
+            width: "10rem",
+            height: "10rem",
+            objectFit: "cover",
+            borderRadius: "50%",
+          }}
+          alt=""
+        />
+        <hr />
+        <p className=" my-2 font-weight-light" style={{ fontSize: "1.5rem" }}>
+          Or create new one!
+        </p>
+        <Form.Group controlId="blog-author" className="mt-3">
+          <Form.Label>Name</Form.Label>
+          <Form.Control
+            size="lg"
+            placeholder="Author name"
+            value={Post.author.name}
+            onChange={(e) =>
+              setPost({
+                ...Post,
+                author: { ...Post.author, name: e.target.value },
+              })
+            }
+          />
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Avatar</Form.Label>
+          {/* <Form.Control
+            size="lg"
+            placeholder="Avatar"
+            value={Post.author.avatar}
+            onChange={(e) =>
+              setPost({
+                ...Post,
+                author: { ...Post.avatar, avatar: e.target.value },
+              })
+            }
+          />
+        </Form.Group> */}
+          {/* <Form.Group> */}
+          <Form.File
+            id="blog-img"
+            className="my-4"
+            label="Image"
+            onChange={(e) => setCover({ ...Cover, avatar: e.target.files[0] })}
+          />
+        </Form.Group>
+        <Form.Group className="d-flex mt-3 justify-content-end">
+          <Button type="reset" size="lg" variant="outline-dark">
+            Reset
+          </Button>
+          <Button
+            type="submit"
+            size="lg"
+            variant="dark"
+            style={{ marginLeft: "1em" }}
+          >
+            Submit
+          </Button>
+        </Form.Group>
+      </Form>
+    </Container>
+  );
+};
+export default NewBlogPost;
