@@ -55,7 +55,7 @@ class Blog extends Component {
     try {
       let res = await fetch(url, {
         method: "POST",
-        body: JSON.stringify(this.state.email),
+        body: JSON.stringify({ email: this.state.email }),
         headers: { "Content-Type": "application/json" },
       });
       if (res.ok) {
