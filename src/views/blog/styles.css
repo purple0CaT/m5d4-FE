@@ -37,3 +37,11 @@
   flex-direction: column;
   align-items: center;
 }
+
+.comment {
+  text-align: start;
+  border-radius: 20px;
+  border: 1px solid rgba(128, 128, 128, 0.3);
+  padding: 0.2rem 1rem;
+  margin-bottom: 0.2rem;
+}
