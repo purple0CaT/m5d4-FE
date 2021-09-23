@@ -21,7 +21,8 @@ const NewBlogPost = () => {
     },
   });
   const [Authors, setAuthors] = useState({ data: [] });
-  const [Cover, setCover] = useState({ postCover: "", avatar: "" });
+  const [Cover, setCover] = useState();
+  const [Avatar, setAvatar] = useState();
 
   useEffect(() => {
     fetchAuthors();
@@ -71,9 +72,9 @@ const NewBlogPost = () => {
   };
   // Send Cover!
   const sendCover = async (id) => {
-    const url = `${process.env.REACT_APP_URLTOFETCH}/${id}/uploadCover/`;
+    const url = `${process.env.REACT_APP_URLTOFETCH}/blogPosts/${id}/uploadCover/`;
     const formData = new FormData();
-    formData.append("coverPic", Cover.postCover);
+    formData.append("coverPic", Cover);
     try {
       let response = await fetch(url, {
         method: "POST",
@@ -140,9 +141,7 @@ const NewBlogPost = () => {
             className="my-4"
             label=""
             // value={this.state.coverFile}
-            onChange={(e) =>
-              setCover({ ...Cover, postCover: e.target.files[0] })
-            }
+            onChange={(e) => setCover(e.target.files[0])}
           />
         </Form.Group>
         <hr />
@@ -267,9 +266,7 @@ const NewBlogPost = () => {
           {/* <Form.Group> */}
           <Form.File
             id="blog-img"
-            onChange={(e) =>
-              setCover({ ...Cover, avatar: e.target.files[0], _id: "" })
-            }
+            onChange={(e) => setAvatar(e.target.files[0])}
           />
         </Form.Group>
         <Form.Group className="d-flex mt-3 justify-content-end">
