@@ -4,8 +4,10 @@ import ReactQuill from "react-quill";
 import { Container, Form, Button } from "react-bootstrap";
 import "./styles.css";
 import { useState, useEffect } from "react";
+import { useHistory } from "react-router-dom";
 
 const NewBlogPost = () => {
+  let history = useHistory();
   const [Post, setPost] = useState({
     body: {
       category: "123",
@@ -84,7 +86,8 @@ const NewBlogPost = () => {
         },
       });
       if (response.ok) {
-        console.log("Sended!");
+        alert("Sended!");
+        history.push("/");
       } else {
         console.log(formData);
       }
