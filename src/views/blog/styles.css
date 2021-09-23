@@ -44,4 +44,13 @@
   border: 1px solid rgba(128, 128, 128, 0.3);
   padding: 0.2rem 1rem;
   margin-bottom: 0.2rem;
+  transition: 0.2s !important;
+}
+.comment:hover {
+  transform: scale(1.05);
+  z-index: 100;
+  cursor: pointer;
+}
+.comment:active {
+  opacity: 0.1;
 }

@@ -16,7 +16,7 @@ export default class NavBar extends Component {
             as={Link}
             to="/new"
             className="blog-navbar-add-button bg-dark"
-            size="lg"
+            size="md"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

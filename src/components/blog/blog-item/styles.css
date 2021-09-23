@@ -1,15 +1,28 @@
 .blog-cover {
   width: 100%;
-  height: 250px;
+  height: 10rem;
   object-fit: cover;
   object-position: 0% 0%;
 }
 
-.blog-card {
+/* .blog-card {
   height: 100%;
-}
+} */
 
 .blog-link {
   text-decoration: none;
   color: inherit;
+  border-radius: 20px !important;
+  overflow: hidden;
+  transition: 0.2s;
+}
+
+.blog-link:hover {
+  transform: scale(1.04);
+  color: rgb(66, 85, 97);
+  box-shadow: 0 0 15px rgba(128, 128, 128, 0.3);
+  z-index: 100;
+}
+.blog-link:active {
+  opacity: 0.01;
 }
