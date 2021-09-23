@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Container, Image, Row, Col } from "react-bootstrap";
+import { Container, Image, Row, Col, Form } from "react-bootstrap";
 import { withRouter } from "react-router";
 import BlogAuthor from "../../components/blog/blog-author";
 import "./styles.css";
@@ -7,6 +7,7 @@ class Blog extends Component {
   state = {
     blog: {},
     loading: true,
+    newComment: { comment: "", author: "" },
   };
   componentDidMount = () => {
     this.fetchDatas();
@@ -19,7 +20,6 @@ class Blog extends Component {
       let response = await fetch(url);
       let data = await response.json();
       if (response.ok) {
-        console.log(data);
         this.setState({ ...this.state, blog: data });
         this.setState({ ...this.state, loading: false });
       } else {
@@ -29,8 +29,28 @@ class Blog extends Component {
       console.log(err);
     }
   };
+  sendComment = async (e) => {
+    console.log(1);
+    e.preventDefault();
+    const url = `${process.env.REACT_APP_URLTOFETCH}/blogPosts/${this.props.match.params.id}/comments`;
+    try {
+      let res = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify(this.state.newComment),
+        headers: { "Content-Type": "application/json" },
+      });
+      if (res.ok) {
+        alert("Success!");
+        this.fetchDatas();
+      } else {
+        alert("Error!");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
   render() {
-    const { loading, blog } = this.state;
+    const { loading, blog, newComment } = this.state;
     if (loading) {
       return <div>loading</div>;
     } else {
@@ -72,7 +92,7 @@ class Blog extends Component {
                   <hr />
                   {blog[0].comments ? (
                     blog[0].comments.map((com) => (
-                      <div className="comment">
+                      <div className="comment" key={com._id + com.author}>
                         <h5>{com.comment}</h5>
                         <h6 className="text-muted">Author: {com.author}</h6>
                         <small className="text-muted">id: {com._id}</small>
@@ -81,6 +101,47 @@ class Blog extends Component {
                   ) : (
                     <h4> No comments! </h4>
                   )}
+                  <hr />
+                  <h5>Add comment</h5>
+                  <Form onSubmit={this.sendComment}>
+                    <Form.Group>
+                      <Form.Label>Comment</Form.Label>
+                      <Form.Control
+                        value={newComment.comment}
+                        type="comment"
+                        placeholder="... comment"
+                        onChange={(e) =>
+                          this.setState({
+                            ...this.state,
+                            newComment: {
+                              ...this.state.newComment,
+                              comment: e.target.value,
+                            },
+                          })
+                        }
+                      />
+                    </Form.Group>
+                    <Form.Group className="mt-1">
+                      <Form.Label>Author</Form.Label>
+                      <Form.Control
+                        value={newComment.author}
+                        type="author"
+                        placeholder="... author"
+                        onChange={(e) =>
+                          this.setState({
+                            ...this.state,
+                            newComment: {
+                              ...this.state.newComment,
+                              author: e.target.value,
+                            },
+                          })
+                        }
+                      />
+                    </Form.Group>
+                    <button type="submit" className="btn btn-light mt-2">
+                      Send comment
+                    </button>
+                  </Form>
                 </div>
               </Col>
             </Row>
