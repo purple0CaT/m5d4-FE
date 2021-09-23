@@ -30,7 +30,6 @@ class Blog extends Component {
     }
   };
   sendComment = async (e) => {
-    console.log(1);
     e.preventDefault();
     const url = `${process.env.REACT_APP_URLTOFETCH}/blogPosts/${this.props.match.params.id}/comments`;
     try {
@@ -90,23 +89,22 @@ class Blog extends Component {
                 <div className="d-flex flex-column align-middle text-center">
                   <h2>Commentaries</h2>
                   <hr />
-                  {blog[0].comments ? (
+                  {blog[0].comments &&
                     blog[0].comments.map((com) => (
                       <div className="comment" key={com._id + com.author}>
                         <h5>{com.comment}</h5>
                         <h6 className="text-muted">Author: {com.author}</h6>
                         <small className="text-muted">id: {com._id}</small>
                       </div>
-                    ))
-                  ) : (
-                    <h4> No comments! </h4>
-                  )}
+                    ))}
+
                   <hr />
                   <h5>Add comment</h5>
                   <Form onSubmit={this.sendComment}>
                     <Form.Group>
                       <Form.Label>Comment</Form.Label>
                       <Form.Control
+                        required
                         value={newComment.comment}
                         type="comment"
                         placeholder="... comment"
@@ -124,6 +122,7 @@ class Blog extends Component {
                     <Form.Group className="mt-1">
                       <Form.Label>Author</Form.Label>
                       <Form.Control
+                        required
                         value={newComment.author}
                         type="author"
                         placeholder="... author"
