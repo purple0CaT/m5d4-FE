@@ -97,6 +97,7 @@ class Blog extends Component {
                 <div
                   dangerouslySetInnerHTML={{ __html: blog[0].content }}
                 ></div>
+                <hr />
                 <div className="d-flex flex-column">
                   <div>
                     <a
@@ -105,8 +106,14 @@ class Blog extends Component {
                     >
                       Download as PDF
                     </a>
+                    <a
+                      className="btn btn-light mx-3"
+                      href={`${process.env.REACT_APP_URLTOFETCH}/pdfs/saveCSV`}
+                    >
+                      Download Authors (CSV)
+                    </a>
                   </div>
-                  <hr />
+                  <br />
                   <div className="d-flex">
                     <Form onSubmit={this.sendPdfByEmail}>
                       <Form.Group>
