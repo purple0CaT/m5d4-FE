@@ -7,6 +7,7 @@ class Blog extends Component {
   state = {
     blog: {},
     loading: true,
+    email: "",
     newComment: { comment: "", author: "" },
   };
   componentDidMount = () => {
@@ -48,8 +49,26 @@ class Blog extends Component {
       console.log(err);
     }
   };
+  sendPdfByEmail = async (e) => {
+    e.preventDefault();
+    const url = `${process.env.REACT_APP_URLTOFETCH}/pdfs/${this.props.match.params.id}/sendPdfEmail`;
+    try {
+      let res = await fetch(url, {
+        method: "POST",
+        body: JSON.stringify(this.state.email),
+        headers: { "Content-Type": "application/json" },
+      });
+      if (res.ok) {
+        alert("Success!");
+      } else {
+        alert("Error!");
+      }
+    } catch (err) {
+      console.log(err);
+    }
+  };
   render() {
-    const { loading, blog, newComment } = this.state;
+    const { loading, blog, newComment, email } = this.state;
     if (loading) {
       return <div>loading</div>;
     } else {
@@ -78,13 +97,41 @@ class Blog extends Component {
                 <div
                   dangerouslySetInnerHTML={{ __html: blog[0].content }}
                 ></div>
-                <a
-                  className="btn btn-primary"
-                  href={`${process.env.REACT_APP_URLTOFETCH}/blogPosts/${this.props.match.params.id}/savePDF`}
-                >
-                  Download as PDF
-                </a>
+                <div className="d-flex flex-column">
+                  <div>
+                    <a
+                      className="btn btn-primary"
+                      href={`${process.env.REACT_APP_URLTOFETCH}/pdfs/${this.props.match.params.id}/savePDF`}
+                    >
+                      Download as PDF
+                    </a>
+                  </div>
+                  <hr />
+                  <div className="d-flex">
+                    <Form onSubmit={this.sendPdfByEmail}>
+                      <Form.Group>
+                        <Form.Label>Or send PDF on your E-mail</Form.Label>
+                        <Form.Control
+                          required
+                          value={email}
+                          type="email"
+                          placeholder="... email"
+                          onChange={(e) =>
+                            this.setState({
+                              ...this.state,
+                              email: e.target.value,
+                            })
+                          }
+                        />
+                      </Form.Group>
+                      <button type="submit" className="btn btn-info mt-1">
+                        Send PDF
+                      </button>
+                    </Form>
+                  </div>
+                </div>
               </Col>
+              {/* COMMENTS AREA */}
               <Col xs={12} md={3}>
                 <div className="d-flex flex-column align-middle text-center">
                   <h2>Commentaries</h2>
